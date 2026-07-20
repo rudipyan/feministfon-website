@@ -183,8 +183,13 @@
      Reverted to two separate full-width sections per feedback (the diptych
      card treatment for Misyonumuz looked worse, not better). */
   #hikayemiz { position: relative; overflow: hidden; }
-  .story-row { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(140px, 0.55fr) minmax(0,1fr); gap: clamp(1.25rem, 3vw, 2.25rem); align-items: start; padding-left: clamp(1rem, 6vw, 4.5rem); }
-  @media (max-width: 860px) { .story-row { grid-template-columns: minmax(0,1fr); padding-left: 0; } }
+  /* The extra left indent (beyond .wrap's own side padding) is only for the
+     desktop two-column layout, where the sticky heading column needs room.
+     Scoped to min-width so the collapsed mobile/tablet layout below just
+     inherits .wrap's normal padding instead of this overriding it to 0. */
+  .story-row { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(140px, 0.55fr) minmax(0,1fr); gap: clamp(1.25rem, 3vw, 2.25rem); align-items: start; }
+  @media (min-width: 861px) { .story-row { padding-left: clamp(1rem, 6vw, 4.5rem); } }
+  @media (max-width: 860px) { .story-row { grid-template-columns: minmax(0,1fr); } }
   .story-aside { position: sticky; top: 100px; }
   @media (max-width: 860px) { .story-aside { position: static; } }
   .story-copy { border-left: 4px solid var(--color-coral); border-radius: 2px; padding-left: var(--space-lg); max-width: 58ch; }
