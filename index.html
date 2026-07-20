@@ -109,13 +109,15 @@
   @media (max-width: 900px) { .nav-links, .nav-social, .nav-lang { display: none; } .nav-toggle { display: inline-flex; } }
   @media (max-width: 640px) { .nav-lockup { height: 56px; } }
 
-  .mobile-menu { position: fixed; inset: 0; z-index: 110; background: var(--color-coral); color: #fff; display: flex; flex-direction: column; padding: var(--space-lg); }
+  /* Compact dropdown anchored under the toggle button — not a full-screen
+     takeover. The toggle itself doubles as open/close (icon + aria-label
+     both flip), so there's no separate close button in the panel. */
+  .mobile-menu { position: fixed; top: 88px; right: var(--space-md); z-index: 110; width: min(240px, calc(100vw - 2 * var(--space-md))); background: var(--color-coral); color: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-soft); padding: var(--space-xs) var(--space-md); }
   .mobile-menu[hidden] { display: none; }
-  .mobile-menu-head { display: flex; justify-content: flex-end; }
-  .mobile-menu-close { width: 44px; height: 44px; border-radius: 999px; border: none; background: rgba(255,255,255,0.15); color: #fff; font-size: 1.2rem; cursor: pointer; }
-  .mobile-menu-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-  .mobile-menu ul { list-style: none; margin: auto 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-lg); }
-  .mobile-menu a { font-family: var(--font-display); font-weight: 600; font-size: var(--text-h3); text-decoration: none; min-height: 44px; display: inline-block; }
+  .mobile-menu ul { list-style: none; margin: 0; padding: 0; }
+  .mobile-menu li + li { border-top: 1px solid rgba(255,255,255,0.2); }
+  .mobile-menu a { font-family: var(--font-display); font-weight: 600; font-size: var(--text-body); color: #fff; text-decoration: none; min-height: 44px; display: flex; align-items: center; }
+  .mobile-menu a:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
 
   /* ---------- Hero ---------- */
   /* Nav is now position:fixed (see .nav above) so it floats over the hero
@@ -312,10 +314,7 @@
   </div>
 </nav>
 
-<div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Ana menü" hidden>
-  <div class="mobile-menu-head">
-    <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Menüyü kapat">✕</button>
-  </div>
+<div class="mobile-menu" id="mobile-menu" aria-label="Ana menü" hidden>
   <ul>
     <li><a href="#">Ana sayfa</a></li>
     <li><a href="hakkimizda.html">Hakkımızda</a></li>
@@ -464,33 +463,30 @@
 
   var toggle = document.getElementById('nav-toggle');
   var menu = document.getElementById('mobile-menu');
-  var closeBtn = document.getElementById('mobile-menu-close');
-  // Focus trap: while the menu is open, every other top-level element is
-  // made inert (unfocusable and hidden from assistive tech), so Tab/virtual-
-  // cursor browsing can't reach content sitting behind the full-screen menu.
-  var otherTopLevel = Array.prototype.filter.call(document.body.children, function (el) {
-    return el !== menu && el.tagName !== 'SCRIPT';
-  });
+  // Small anchored dropdown, not a full-screen takeover — no focus trap or
+  // scroll lock needed. The toggle button doubles as open/close (icon +
+  // aria-label both flip); click-outside and Escape also dismiss it.
   function openMenu() {
     menu.removeAttribute('hidden');
     toggle.setAttribute('aria-expanded', 'true');
     toggle.setAttribute('aria-label', 'Menüyü kapat');
-    otherTopLevel.forEach(function (el) { el.setAttribute('inert', ''); el.setAttribute('aria-hidden', 'true'); });
-    closeBtn.focus();
-    document.body.style.overflow = 'hidden';
+    toggle.textContent = '✕';
+    menu.querySelector('a').focus();
   }
   function closeMenu() {
     menu.setAttribute('hidden', '');
     toggle.setAttribute('aria-expanded', 'false');
     toggle.setAttribute('aria-label', 'Menüyü aç');
-    otherTopLevel.forEach(function (el) { el.removeAttribute('inert'); el.removeAttribute('aria-hidden'); });
-    toggle.focus();
-    document.body.style.overflow = '';
+    toggle.textContent = '≡';
   }
-  toggle.addEventListener('click', openMenu);
-  closeBtn.addEventListener('click', closeMenu);
+  toggle.addEventListener('click', function () {
+    if (menu.hasAttribute('hidden')) openMenu(); else closeMenu();
+  });
   menu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeMenu); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hasAttribute('hidden')) closeMenu(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hasAttribute('hidden')) { closeMenu(); toggle.focus(); } });
+  document.addEventListener('click', function (e) {
+    if (!menu.hasAttribute('hidden') && !menu.contains(e.target) && !toggle.contains(e.target)) closeMenu();
+  });
 })();
 </script>
 
