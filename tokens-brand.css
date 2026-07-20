@@ -1,0 +1,130 @@
+/* Brand tokens — sourced directly from FFT-Kurumsal-Kimlik-Tasarimi.pdf
+   (the client's own design guide, provided 2026-07-14) and the real logo
+   SVG files in Kurumsal Kimlik Tasarımı/Logolar Revize. Nothing here is
+   invented; every hex below is copied from the guide's own color pages. */
+:root {
+  /* Monochrome — flipped for the rich-gradient identity (see --flow-* pairs
+     below): body copy is now light-on-gradient sitewide, matching the
+     equalityfund.ca-style reference. --color-ink-onlight is the one fixed
+     dark value kept for text that sits on a light chip/pill regardless of
+     the page background (tags, pill buttons). */
+  --color-paper: #FDF9F3;
+  --color-paper-raised: #ffffff;
+  --color-ink: #ffffff;
+  --color-ink-soft: rgba(255,255,255,0.85);
+  --color-ink-onlight: #1E1E1E;
+
+  /* Primary palette ("Ana Renk Paleti") */
+  --color-coral: #D8563F;   /* "mercan" — the logo's own color */
+  --color-blue: #285EEA;
+  --color-green: #009F74;
+  --color-orange: #FF7900;
+  --color-purple: #6D1283;
+  /* Deepened tint of --color-green — the literal #009F74 swatch is too light
+     to hold contrast under the sitewide white body text at full-bleed
+     background/panel scale (see --flow-close-* below); this is only for
+     that use, not a new primary swatch. */
+  --color-green-deep: #007757;
+
+  /* Secondary palette ("İkincil Renk Paleti") — soft companions */
+  --color-pink-soft: #E9A9D4;
+  --color-lavender-soft: #D299FF;
+  --color-mint-soft: #74FAAB;
+  --color-amber-soft: #F3CB46;
+  --color-fuchsia-soft: #E783FF;
+
+  --color-accent: var(--color-coral);
+  --color-focus: var(--color-blue);
+
+  /* Gradient waypoints — rebuilt again per client feedback: trimmed to
+     three of the institution's "Ana Renk Paleti" primaries (down from
+     four) — blue #285EEA, purple #6D1283, coral #D8563F. Orange dropped
+     entirely: it made the orange coral-decor illustration disappear into
+     an orange background, and with this little content per page, four
+     colors read as more variety than the content justified. Each section
+     is a single waypoint (a=b, one exact brand hex); the fixed flow layer
+     interpolates BOTH the base pair and the mesh bloom colors (see
+     assets/flow-mesh.js) between waypoints as you scroll, so the page
+     glides through blue → purple → coral → purple → blue and actually
+     arrives at each real brand color, not just a blend between two
+     arbitrary points. */
+  --flow-hero-a:  #6D1283; --flow-hero-b:  #6D1283;   /* purple — matches the coral-reef hero backdrop's scrim */
+  --flow-story-a: #6D1283; --flow-story-b: #6D1283;   /* purple */
+  --flow-work-a:  #D8563F; --flow-work-b:  #D8563F;   /* coral */
+  /* Closing İletişim section — deliberately breaks from the blue/purple/coral
+     arc. Was blue, but per client feedback that read as an off-palette
+     grayish teal once blended with its purple bloom; green is the
+     institution's actual teal in the primary palette, so the close scene
+     now runs on --color-green-deep instead — see flow-mesh.js SCENES.close. */
+  --flow-close-a: #007757; --flow-close-b: #007757;   /* green (deep) */
+
+  /* Yayınlar — both its homepage teaser and its own standalone page sit at
+     the purple waypoint. */
+  --flow-pub-a:   #6D1283; --flow-pub-b:   #6D1283;   /* purple */
+
+  /* Same arc, continued on hakkimizda.html (its own page, own scroll run). */
+  --flow-misyon-a:     #6D1283; --flow-misyon-b:     #6D1283; /* purple */
+  --flow-destekciler-a:#D8563F; --flow-destekciler-b:#D8563F; /* coral */
+
+  /* Same arc again on duyurular.html, one stop per announcement — ping-pongs
+     back through blue/purple/coral rather than jumping hue, since there
+     are more announcements than colors. */
+  --flow-duyuru1-a: #285EEA; --flow-duyuru1-b: #285EEA; /* blue */
+  --flow-duyuru2-a: #6D1283; --flow-duyuru2-b: #6D1283; /* purple */
+  --flow-duyuru3-a: #D8563F; --flow-duyuru3-b: #D8563F; /* coral */
+  --flow-duyuru4-a: #6D1283; --flow-duyuru4-b: #6D1283; /* purple (ping back) */
+  --flow-duyuru5-a: #285EEA; --flow-duyuru5-b: #285EEA; /* blue (ping back) */
+  --flow-duyuru6-a: #6D1283; --flow-duyuru6-b: #6D1283; /* purple (ping back) */
+
+  /* Type — Montserrat (headings) + Domine (body), both self-hosted from the
+     client's own Font/ folder, not a substitute. Swapped per client
+     direction: Montserrat now carries display/heading duty, Domine now
+     carries body-copy duty (reverse of the original assignment). */
+  --font-display: "Montserrat", "Helvetica Neue", sans-serif;
+  --font-body: "Domine", Georgia, serif;
+
+  /* Type scale — complete rebuild per Fable design review. Every level is
+     ≥1.33x its neighbor at desktop width so headings stay separable; the
+     old scale had --text-display-s (H2, up to 3rem) overlapping
+     --text-2xl (an H3, up to 2rem), which is exactly why headings weren't
+     distinguishable across the site. One token per role, no ad hoc sizes
+     anywhere else in the CSS. */
+  --text-display: clamp(2.5rem, 1.5rem + 4.5vw, 4.5rem);  /* H1 — hero only */
+  --text-h2:       clamp(1.75rem, 1.2rem + 2.5vw, 3rem);   /* every section H2 */
+  --text-h3:       clamp(1.25rem, 1.1rem + 0.7vw, 1.5rem); /* every sub-heading under an H2 */
+  --text-quote:    clamp(1.5rem, 1.1rem + 1.8vw, 2.25rem); /* manifesto/pull-quote statement */
+  --text-lead:     clamp(1.125rem, 1rem + 0.5vw, 1.25rem); /* hero intro, CTA lede */
+  --text-body:     1rem;                                    /* default paragraphs */
+  --text-small:    0.875rem;                                /* captions, footer, meta */
+  --text-label:    0.75rem;                                 /* tags/badges/eyebrows — always uppercase + tracked */
+
+  /* Back-compat aliases so nothing silently breaks while every usage below
+     is migrated to the names above. */
+  --text-lg: var(--text-lead);
+  --text-md: var(--text-body);
+  --text-sm: var(--text-small);
+
+  /* Spacing, 4pt scale */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+  --space-xl: 3.25rem;
+  --space-2xl: 5rem;
+  --space-3xl: 7.5rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 160ms;
+  --dur-med: 280ms;
+  --dur-reveal: 620ms;
+
+  /* Soft, easy-going geometry — no sharp brutalist corners anywhere. */
+  --radius-card: 28px;
+  --radius-chip: 999px;
+  --radius-btn: 999px;
+  --shadow-soft: 0 12px 32px rgba(30, 30, 30, 0.10);
+  --shadow-softer: 0 6px 18px rgba(30, 30, 30, 0.07);
+}
