@@ -219,10 +219,10 @@
      publications). Each slide reuses the same .pub-row card that used to be
      the whole section, so the single-publication view still looks the same
      as it always did — it's just slide 1 of several now. ---------- */
-  .pub-row { display: grid; grid-template-columns: minmax(0,220px) minmax(0,1fr); gap: var(--space-xl); align-items: center; }
+  .pub-row { display: grid; grid-template-columns: minmax(0,270px) minmax(0,1fr); gap: var(--space-xl); align-items: center; }
   @media (max-width: 640px) { .pub-row { grid-template-columns: minmax(0,1fr); } }
   .pub-cover { border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-soft); }
-  .pub-cover img { width: 100%; aspect-ratio: 635 / 936; object-fit: cover; }
+  .pub-cover img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
   .pub-copy p { color: var(--color-ink-soft); margin: var(--space-md) 0 var(--space-lg); max-width: 56ch; text-wrap: pretty; }
 
   .pub-track { list-style: none; margin: 0; padding: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
@@ -346,7 +346,6 @@
   <ul>
     <li><a href="#">Ana sayfa</a></li>
     <li><a href="hakkimizda.html">Hakkımızda</a></li>
-    <li><a href="kvkk.html">KVKK</a></li>
     <li><a href="duyurular.html">Duyurular</a></li>
     <li><a href="yayinlar.html">Yayınlar</a></li>
     <li><a href="#iletisim">İletişim</a></li>
