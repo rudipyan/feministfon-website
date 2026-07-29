@@ -12,6 +12,7 @@ export default {
       options: {
         source: 'titleTr',
         slugify: (input) => transliterateTr(input).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 96),
+        isUnique: (value, context) => context.defaultIsUnique(value, context),
       },
       validation: (Rule) => Rule.required(),
     },
