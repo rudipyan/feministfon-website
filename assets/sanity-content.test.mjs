@@ -34,3 +34,19 @@ test('renderAnnouncementHTML omits the link block when linkUrl is absent', () =>
   const html = renderAnnouncementHTML(doc, 'tr');
   assert.doesNotMatch(html, /report-link/);
 });
+
+test('renderAnnouncementHTML handles missing teaser and empty bodyEn gracefully', () => {
+  const doc = {
+    slug: { current: 'test-en' },
+    titleTr: 'Türkçe Başlık', titleEn: 'English Title',
+    dateLabel: '2026',
+    coverUrl: 'https://cdn.sanity.io/x.png',
+    coverImageAltTr: 'TR Alt', coverImageAltEn: 'EN Alt',
+    bodyTr: ['Turkish body paragraph.'],
+    bodyEn: [], // empty array — should fallback to bodyTr
+  };
+  const html = renderAnnouncementHTML(doc, 'en');
+  assert.match(html, /<h2>English Title<\/h2>/);
+  assert.match(html, /Turkish body paragraph\./);
+  assert.match(html, /alt="EN Alt"/);
+});

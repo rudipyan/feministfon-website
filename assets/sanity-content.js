@@ -9,7 +9,7 @@ function escapeHtml(str) {
 
 export function renderAnnouncementHTML(doc, lang) {
   const title = resolveLocalized(doc, 'title', lang);
-  const alt = lang === 'tr' ? doc.coverImageAltTr : (doc.coverImageAltEn || doc.coverImageAltTr);
+  const alt = resolveLocalized(doc, 'coverImageAlt', lang);
   const paragraphs = lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr);
   const bodyHtml = (paragraphs || []).map((p) => `<p>${escapeHtml(p)}</p>`).join('\n');
   const linkLabel = resolveLocalized(doc, 'linkLabel', lang);
@@ -31,7 +31,7 @@ export function renderAnnouncementHTML(doc, lang) {
 
 export function renderPublicationHTML(doc, lang, { embed } = { embed: false }) {
   const title = resolveLocalized(doc, 'title', lang);
-  const alt = lang === 'tr' ? doc.coverImageAltTr : (doc.coverImageAltEn || doc.coverImageAltTr);
+  const alt = resolveLocalized(doc, 'coverImageAlt', lang);
   const readLabel = lang === 'tr' ? 'Raporu Okuyun' : 'Read the report';
   const card = `<div class="pub-row">
     <div class="pub-cover"><img src="${escapeHtml(buildCoverUrl(doc.coverUrl, 600))}" alt="${escapeHtml(alt)}"></div>
@@ -74,6 +74,7 @@ function scrollToHash(container) {
 
 export async function initAnnouncements(containerId) {
   const container = document.getElementById(containerId);
+  if (!container) return;
   const lang = document.documentElement.lang === 'tr' ? 'tr' : 'en';
   try {
     const docs = await fetchDocs('announcement');
@@ -86,6 +87,7 @@ export async function initAnnouncements(containerId) {
 
 export async function initPublications(containerId) {
   const container = document.getElementById(containerId);
+  if (!container) return;
   const lang = document.documentElement.lang === 'tr' ? 'tr' : 'en';
   try {
     const docs = await fetchDocs('publication');
@@ -98,6 +100,7 @@ export async function initPublications(containerId) {
 
 export async function initCarousel(containerId, onRendered) {
   const container = document.getElementById(containerId);
+  if (!container) return;
   const lang = document.documentElement.lang === 'tr' ? 'tr' : 'en';
   try {
     const [announcements, publications] = await Promise.all([
@@ -109,9 +112,10 @@ export async function initCarousel(containerId, onRendered) {
       .slice(0, 6);
     container.innerHTML = combined.map((doc) => {
       const isPublication = 'pdfUrl' in doc;
-      const teaser = resolveLocalized(doc, 'teaser', lang) || truncateTeaser(resolveLocalized(doc, 'body', lang) ? (lang === 'tr' ? doc.bodyTr : doc.bodyEn)?.[0] : '', 140);
+      const teaser = resolveLocalized(doc, 'teaser', lang)
+        || truncateTeaser((lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr))?.[0] || '', 140);
       const title = resolveLocalized(doc, 'title', lang);
-      const alt = lang === 'tr' ? doc.coverImageAltTr : (doc.coverImageAltEn || doc.coverImageAltTr);
+      const alt = resolveLocalized(doc, 'coverImageAlt', lang);
       const targetPage = isPublication
         ? (lang === 'tr' ? 'yayinlar.html' : 'en-yayinlar.html')
         : (lang === 'tr' ? 'duyurular.html' : 'en-duyurular.html');
