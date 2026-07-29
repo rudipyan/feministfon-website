@@ -25,6 +25,13 @@
      background/panel scale (see --flow-close-* below); this is only for
      that use, not a new primary swatch. */
   --color-green-deep: #007757;
+  /* Deepened tint of --color-coral, same rationale as --color-green-deep
+     above: full-saturation coral (#D8563F) measures 3.76:1 against white
+     text/paper backgrounds and 3.95:1 for white-on-coral fills — both fail
+     WCAG AA (4.5:1). Used for text/panel-on-light contexts (the mobile
+     dropdown, and the light-theme kvkk/404 pages) where coral is doing
+     content-bearing duty rather than acting as a mark/accent. */
+  --color-coral-onlight: #9E3A28;
 
   /* Secondary palette ("İkincil Renk Paleti") — soft companions */
   --color-pink-soft: #E9A9D4;
@@ -34,7 +41,10 @@
   --color-fuchsia-soft: #E783FF;
 
   --color-accent: var(--color-coral);
-  --color-focus: var(--color-blue);
+  /* White + a dark halo (see .btn:focus-visible) instead of the brand blue —
+     #285EEA measured at 1.05:1 against the blue gradient waypoint (WCAG
+     1.4.11 needs 3:1), making the ring invisible for keyboard users there. */
+  --color-focus: #ffffff;
 
   /* Gradient waypoints — rebuilt again per client feedback: trimmed to
      three of the institution's "Ana Renk Paleti" primaries (down from
