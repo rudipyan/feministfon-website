@@ -1,7 +1,7 @@
 // assets/sanity-content.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { renderAnnouncementHTML } from './sanity-content.js';
+import { renderAnnouncementHTML, buildCarouselLinkTarget } from './sanity-content.js';
 
 test('renderAnnouncementHTML produces the expected structure with a link', () => {
   const doc = {
@@ -49,4 +49,34 @@ test('renderAnnouncementHTML handles missing teaser and empty bodyEn gracefully'
   assert.match(html, /<h2>English Title<\/h2>/);
   assert.match(html, /Turkish body paragraph\./);
   assert.match(html, /alt="EN Alt"/);
+});
+
+test('renderAnnouncementHTML escapes double quotes so they cannot break out of an attribute', () => {
+  const doc = {
+    slug: { current: 'quote-test' },
+    titleTr: 'Başlık', titleEn: 'Title',
+    dateLabel: '2026',
+    coverUrl: 'https://cdn.sanity.io/x.png',
+    coverImageAltTr: 'Zararlı" onerror="alert(1)', coverImageAltEn: 'Zararlı" onerror="alert(1)',
+    bodyTr: ['Paragraf.'],
+    linkUrl: 'https://example.org/x"onclick="alert(1)',
+    linkLabelTr: 'Link',
+  };
+  const html = renderAnnouncementHTML(doc, 'tr');
+  assert.doesNotMatch(html, /onerror="alert\(1\)"/);
+  assert.doesNotMatch(html, /onclick="alert\(1\)"/);
+  assert.match(html, /alt="Zararlı&quot; onerror=&quot;alert\(1\)"/);
+  assert.match(html, /href="https:\/\/example\.org\/x&quot;onclick=&quot;alert\(1\)"/);
+});
+
+test('buildCarouselLinkTarget routes announcements to duyurular pages by kind, not field presence', () => {
+  const announcement = { _kind: 'announcement', pdfUrl: null };
+  assert.equal(buildCarouselLinkTarget(announcement, 'tr'), 'duyurular.html');
+  assert.equal(buildCarouselLinkTarget(announcement, 'en'), 'en-duyurular.html');
+});
+
+test('buildCarouselLinkTarget routes publications to yayinlar pages', () => {
+  const publication = { _kind: 'publication', pdfUrl: 'https://example.org/report.pdf' };
+  assert.equal(buildCarouselLinkTarget(publication, 'tr'), 'yayinlar.html');
+  assert.equal(buildCarouselLinkTarget(publication, 'en'), 'en-yayinlar.html');
 });

@@ -537,6 +537,12 @@
     var pubIndex = 0;
     var pubReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    if (pubCount === 0) {
+      pubPrev.disabled = true;
+      pubNext.disabled = true;
+      return;
+    }
+
     // Slide width + track gap — not just clientWidth — since mobile peeks
     // the next slide at <100% width with a gap between cards.
     function pubStep() {

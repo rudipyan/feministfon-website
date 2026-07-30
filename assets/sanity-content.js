@@ -2,8 +2,6 @@ import { resolveLocalized, truncateTeaser, buildCoverUrl, buildQuery } from './s
 import { SANITY_PROJECT_ID, SANITY_DATASET, SANITY_API_VERSION } from './sanity-config.js';
 
 function escapeHtml(str) {
-  const div = typeof document !== 'undefined' ? document.createElement('div') : null;
-  if (div) { div.textContent = str; return div.innerHTML; }
   return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
@@ -98,6 +96,13 @@ export async function initPublications(containerId) {
   }
 }
 
+export function buildCarouselLinkTarget(doc, lang) {
+  const isPublication = doc._kind === 'publication';
+  return isPublication
+    ? (lang === 'tr' ? 'yayinlar.html' : 'en-yayinlar.html')
+    : (lang === 'tr' ? 'duyurular.html' : 'en-duyurular.html');
+}
+
 export async function initCarousel(containerId, onRendered) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -107,18 +112,18 @@ export async function initCarousel(containerId, onRendered) {
       fetchDocs('announcement', { limit: 6 }),
       fetchDocs('publication', { limit: 6 }),
     ]);
-    const combined = [...announcements, ...publications]
+    const combined = [
+      ...announcements.map((d) => ({ ...d, _kind: 'announcement' })),
+      ...publications.map((d) => ({ ...d, _kind: 'publication' })),
+    ]
       .sort((a, b) => (b.order ?? -1) - (a.order ?? -1) || new Date(b.publishedAt) - new Date(a.publishedAt))
       .slice(0, 6);
     container.innerHTML = combined.map((doc) => {
-      const isPublication = 'pdfUrl' in doc;
       const teaser = resolveLocalized(doc, 'teaser', lang)
         || truncateTeaser((lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr))?.[0] || '', 140);
       const title = resolveLocalized(doc, 'title', lang);
       const alt = resolveLocalized(doc, 'coverImageAlt', lang);
-      const targetPage = isPublication
-        ? (lang === 'tr' ? 'yayinlar.html' : 'en-yayinlar.html')
-        : (lang === 'tr' ? 'duyurular.html' : 'en-duyurular.html');
+      const targetPage = buildCarouselLinkTarget(doc, lang);
       const readmore = lang === 'tr' ? 'Devamını oku' : 'Read more';
       return `<li class="pub-slide">
         <article class="pub-row">
