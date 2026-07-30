@@ -305,73 +305,7 @@
       <h2 class="section-label">Announcements</h2>
     </div>
     <div class="pub-carousel reveal">
-      <ul class="pub-track" id="pub-track" tabindex="0" role="group" aria-label="Recent publications and announcements, scrollable">
-        <li class="pub-slide">
-          <article class="pub-row">
-            <div class="pub-cover"><img src="ffi-rapor-cover.png" alt="A Feminist Fund in Türkiye: Needs, Challenges, and Possibilities — feasibility report cover"></div>
-            <div class="pub-copy">
-              <h3>A Feminist Fund in Türkiye: Needs, Challenges, and Possibilities</h3>
-              <p>Our feasibility report is out, drawing from interviews with 30 women's, feminist, and LGBTI+ organizations across 11 provinces.</p>
-              <a class="pub-readmore" href="en-yayinlar.html">Read more<span aria-hidden="true"> →</span><span class="visually-hidden"> (on the Publications page)</span></a>
-            </div>
-          </article>
-        </li>
-        <li class="pub-slide">
-          <article class="pub-row">
-            <div class="pub-cover"><img src="assets/duyurular/duyuru-5.png" alt="Women Deliver 2026 Konferansı"></div>
-            <div class="pub-copy">
-              <div class="pub-meta">27–30 April 2026 · Naarm (Melbourne), Australia</div>
-              <h3>We were at the Women Deliver 2026 Conference</h3>
-              <p>As the Feminist Fund Initiative (FFI), we took part in the international Women Deliver 2026 Conference, held in Naarm (Melbourne), Australia, on 27–30 April 2026.</p>
-              <a class="pub-readmore" href="en-duyurular.html#duyuru2">Read more<span aria-hidden="true"> →</span><span class="visually-hidden"> (on the Announcements page)</span></a>
-            </div>
-          </article>
-        </li>
-        <li class="pub-slide">
-          <article class="pub-row">
-            <div class="pub-cover"><img src="assets/duyurular/duyuru-4.png" alt="#PaylaşmaGünü paneli"></div>
-            <div class="pub-copy">
-              <div class="pub-meta">2 December 2025</div>
-              <h3>#PaylaşmaGünü: what's happening in civil society as resources shrink?</h3>
-              <p>We came together on 2 December 2025 for #PaylaşmaGünü, coordinated nationally by the Third Sector Foundation of Turkey (TÜSEV) to highlight the importance of giving and volunteering and to celebrate a culture of sharing.</p>
-              <a class="pub-readmore" href="en-duyurular.html#duyuru3">Read more<span aria-hidden="true"> →</span><span class="visually-hidden"> (on the Announcements page)</span></a>
-            </div>
-          </article>
-        </li>
-        <li class="pub-slide">
-          <article class="pub-row">
-            <div class="pub-cover"><img src="assets/duyurular/duyuru-2.png" alt="Genç Feministlerin Ön Saflardan Kriz Müdahelesi raporu"></div>
-            <div class="pub-copy">
-              <div class="pub-meta">25 June 2025</div>
-              <h3>Report published: "Young Feminist Frontline Crisis Response to the Earthquake in Syria and Turkey"</h3>
-              <p>A report titled "Young Feminist Frontline Crisis Response to the Earthquake in Syria and Turkey," developed in partnership with Global Resilience Fund and Purposeful and shaped in part by our own Ezgi Kan, has been published.</p>
-              <a class="pub-readmore" href="en-duyurular.html#duyuru4">Read more<span aria-hidden="true"> →</span><span class="visually-hidden"> (on the Announcements page)</span></a>
-            </div>
-          </article>
-        </li>
-        <li class="pub-slide">
-          <article class="pub-row">
-            <div class="pub-cover"><img src="assets/duyurular/duyuru-3.png" alt="EDGE Konferansı"></div>
-            <div class="pub-copy">
-              <div class="pub-meta">28–30 April 2025 · Bogotá, Colombia</div>
-              <h3>We were at the EDGE Conference: "From Commitment to Action: Accountability in Philanthropy"</h3>
-              <p>As the Feminist Fund Initiative, we were at the EDGE Conference in Bogotá, Colombia, on 28–30 April 2025.</p>
-              <a class="pub-readmore" href="en-duyurular.html#duyuru5">Read more<span aria-hidden="true"> →</span><span class="visually-hidden"> (on the Announcements page)</span></a>
-            </div>
-          </article>
-        </li>
-        <li class="pub-slide">
-          <article class="pub-row">
-            <div class="pub-cover"><img src="assets/duyurular/duyuru-1.png" alt="CSW68 etkinliği"></div>
-            <div class="pub-copy">
-              <div class="pub-meta">21 March 2024</div>
-              <h3>Feminist strategies at CSW68</h3>
-              <p>As part of the 68th Session of the UN Commission on the Status of Women (CSW68), we took part in an online parallel event on 21 March 2024, "Attacks on Our Rights, Women's Poverty, and Feminist Strategies to Combat Poverty," organized by the Women's Human Rights Association (KİH).</p>
-              <a class="pub-readmore" href="en-duyurular.html#duyuru6">Read more<span aria-hidden="true"> →</span><span class="visually-hidden"> (on the Announcements page)</span></a>
-            </div>
-          </article>
-        </li>
-      </ul>
+      <ul class="pub-track" id="pub-track" tabindex="0" role="group" aria-label="Recent publications and announcements, scrollable"></ul>
       <div class="pub-nav">
         <button type="button" class="pub-arrow" id="pub-prev" aria-label="Previous">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -484,8 +418,9 @@
     if (window.innerWidth > 900 && !menu.hasAttribute('hidden')) closeMenu();
   });
 
-  var pubTrack = document.getElementById('pub-track');
-  if (pubTrack) {
+  function initPubCarouselBehavior() {
+    var pubTrack = document.getElementById('pub-track');
+    if (!pubTrack) return;
     var pubSlides = pubTrack.querySelectorAll('.pub-slide');
     var pubPrev = document.getElementById('pub-prev');
     var pubNext = document.getElementById('pub-next');
@@ -529,7 +464,13 @@
     window.addEventListener('resize', function () { pubTrack.scrollLeft = pubIndex * pubStep(); });
     pubUpdate();
   }
+  window.initPubCarouselBehavior = initPubCarouselBehavior;
 })();
+</script>
+
+<script type="module">
+  import { initCarousel } from './assets/sanity-content.js';
+  initCarousel('pub-track', () => window.initPubCarouselBehavior());
 </script>
 
 </body>
