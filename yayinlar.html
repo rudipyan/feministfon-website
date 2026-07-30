@@ -134,23 +134,7 @@
   </div>
 
   <section data-flow="pub">
-    <div class="pub-row">
-      <div class="pub-cover"><img src="ffi-rapor-cover.png" alt="Türkiye'de Feminist Bir Fon: İhtiyaçlar, Zorluklar ve Olanaklar — Fizibilite Raporu kapağı"></div>
-      <div class="pub-copy">
-        <h2>Türkiye'de Feminist Bir Fon: İhtiyaçlar, Zorluklar ve Olanaklar</h2>
-        <div class="pub-meta">
-          <span class="pub-date">Haziran 2026</span>
-          <a class="btn btn-primary" href="https://feministfon.org/wp-content/uploads/2026/06/ffi-fizibilite-raporu-2026.pdf" target="_blank" rel="noopener">Raporu Okuyun<span class="visually-hidden"> (yeni sekmede açılır)</span></a>
-        </div>
-        <p>Türkiye'de 11 ilden 30 kadın, feminist ve LGBTİ+ örgütüyle yaptığımız görüşmelere dayanan "Türkiye'de Feminist Bir Fon: İhtiyaçlar, Zorluklar ve Olanaklar" başlıklı fizibilite raporumuz çıktı!</p>
-        <p>Raporumuz, bu alanlarda çalışan hak temelli örgütlerin daralan sivil alanda karşı karşıya kaldığı finansal sürdürülebilirlik krizini örgütlerle yaptığı görüşmeler üzerinden somut tanıklıklarla belgeliyor. Mevcut hiyerarşik hibe sisteminin yarattığı bürokratik ve operasyonel tıkanıklıkları ortaya koyarken, hareket aktörlerinin katılımcı fon modellerine dair ihtiyaç ve çekincelerini de birlikte tartışmaya açıyor. Güven temelli, hareketin ihtiyaçlarını gören, esnek bir hibe modelinin zeminini hep beraber inşa etmeyi ve bu modeli Türkiye'de var edebilmenin olanaklarına ve ihtimallerine bakan çalışmamıza buradan ulaşabilirsiniz.</p>
-      </div>
-    </div>
-    <div class="pub-reader">
-      <object class="pub-reader__embed" data="https://feministfon.org/wp-content/uploads/2026/06/ffi-fizibilite-raporu-2026.pdf" type="application/pdf" aria-label="Türkiye'de Feminist Bir Fon: İhtiyaçlar, Zorluklar ve Olanaklar raporu, sayfa içinde okunabilir">
-        <p class="pub-reader__fallback">Tarayıcınız PDF'i bu sayfada görüntüleyemiyor. <a href="https://feministfon.org/wp-content/uploads/2026/06/ffi-fizibilite-raporu-2026.pdf" target="_blank" rel="noopener">Raporu yeni sekmede açmak için tıklayın</a>.</p>
-      </object>
-    </div>
+    <div id="yayinlar-list"></div>
   </section>
 </main>
 
@@ -198,6 +182,11 @@
     if (window.innerWidth > 900 && !menu.hasAttribute('hidden')) closeMenu();
   });
 })();
+</script>
+
+<script type="module">
+  import { initPublications } from './assets/sanity-content.js';
+  initPublications('yayinlar-list');
 </script>
 
 </body>
