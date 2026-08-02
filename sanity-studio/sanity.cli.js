@@ -3,4 +3,5 @@ export default {
     projectId: '6x1ga0me',
     dataset: 'production',
   },
+  studioHost: 'feministfon',
 };
