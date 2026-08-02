@@ -1,8 +1,23 @@
-// scripts/seed-content.mjs — one-off, run manually after Task 8. Requires
-// SANITY_PROJECT_ID, SANITY_DATASET, SANITY_WRITE_TOKEN env vars.
-const { SANITY_PROJECT_ID, SANITY_DATASET, SANITY_WRITE_TOKEN } = process.env;
+// scripts/seed-content.mjs — ALREADY RUN. This one-off script created the
+// 7 live announcement/publication documents currently in production. It is
+// NOT idempotent — it always issues `create` mutations with no dedupe, so
+// running it again will create 7 duplicate documents with no error or
+// warning. Do not run this again unless you have first deleted the
+// existing seeded documents in Studio, or you accept the duplicates.
+// Requires SANITY_PROJECT_ID, SANITY_DATASET, SANITY_WRITE_TOKEN, and
+// SEED_CONFIRM=yes env vars (the last one is a deliberate extra guard
+// against an accidental re-run).
+const { SANITY_PROJECT_ID, SANITY_DATASET, SANITY_WRITE_TOKEN, SEED_CONFIRM } = process.env;
 if (!SANITY_PROJECT_ID || !SANITY_WRITE_TOKEN) {
   console.error('Set SANITY_PROJECT_ID, SANITY_DATASET, SANITY_WRITE_TOKEN first.');
+  process.exit(1);
+}
+if (SEED_CONFIRM !== 'yes') {
+  console.error(
+    'This script has ALREADY BEEN RUN — the 7 documents it creates already exist in production.\n' +
+    'Running it again will create 7 duplicate documents with no error or warning.\n' +
+    'If you are certain you want to re-run it, set SEED_CONFIRM=yes and try again.'
+  );
   process.exit(1);
 }
 
