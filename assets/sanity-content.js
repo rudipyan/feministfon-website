@@ -5,16 +5,17 @@ function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-export function renderAnnouncementHTML(doc, lang) {
+export function renderAnnouncementHTML(doc, lang, index = 0) {
   const title = resolveLocalized(doc, 'title', lang);
   const alt = resolveLocalized(doc, 'coverImageAlt', lang);
   const paragraphs = lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr);
   const bodyHtml = (paragraphs || []).map((p) => `<p>${escapeHtml(p)}</p>`).join('\n');
   const linkLabel = resolveLocalized(doc, 'linkLabel', lang);
+  const newTabSuffix = lang === 'tr' ? ' (yeni sekmede açılır)' : ' (opens in new tab)';
   const linkHtml = doc.linkUrl
-    ? `<p><a class="report-link" href="${escapeHtml(doc.linkUrl)}" target="_blank" rel="noopener">${escapeHtml(linkLabel || doc.linkUrl)}<span class="visually-hidden"> (yeni sekmede açılır)</span></a></p>`
+    ? `<p><a class="report-link" href="${escapeHtml(doc.linkUrl)}" target="_blank" rel="noopener">${escapeHtml(linkLabel || doc.linkUrl)}<span class="visually-hidden">${newTabSuffix}</span></a></p>`
     : '';
-  return `<article class="duyuru" id="${escapeHtml(doc.slug.current)}">
+  return `<article class="duyuru" id="${escapeHtml(doc.slug.current)}" data-flow="duyuru${index + 1}">
     <div class="duyuru-row">
       <div class="duyuru-cover"><img src="${escapeHtml(buildCoverUrl(doc.coverUrl, 600))}" alt="${escapeHtml(alt)}"></div>
       <div class="duyuru-copy">
@@ -30,22 +31,30 @@ export function renderAnnouncementHTML(doc, lang) {
 export function renderPublicationHTML(doc, lang, { embed } = { embed: false }) {
   const title = resolveLocalized(doc, 'title', lang);
   const alt = resolveLocalized(doc, 'coverImageAlt', lang);
-  const readLabel = lang === 'tr' ? 'Raporu Okuyun' : 'Read the report';
-  const card = `<div class="pub-row">
+  const readLabel = lang === 'tr' ? 'Raporu Okuyun' : 'Read the Report';
+  const newTabSuffix = lang === 'tr' ? ' (yeni sekmede açılır)' : ' (opens in new tab)';
+  const paragraphs = lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr);
+  const bodyHtml = (paragraphs || []).map((p) => `<p>${escapeHtml(p)}</p>`).join('\n');
+  const card = `<div class="pub-row" id="${escapeHtml(doc.slug.current)}">
     <div class="pub-cover"><img src="${escapeHtml(buildCoverUrl(doc.coverUrl, 600))}" alt="${escapeHtml(alt)}"></div>
     <div class="pub-copy">
       <h2>${escapeHtml(title)}</h2>
       <div class="pub-meta">
         <span class="pub-date">${escapeHtml(doc.dateLabel)}</span>
-        <a class="btn btn-primary" href="${escapeHtml(doc.pdfUrl)}" target="_blank" rel="noopener">${readLabel}<span class="visually-hidden"> (yeni sekmede açılır)</span></a>
+        <a class="btn btn-primary" href="${escapeHtml(doc.pdfUrl)}" target="_blank" rel="noopener">${readLabel}<span class="visually-hidden">${newTabSuffix}</span></a>
       </div>
+      ${bodyHtml}
     </div>
   </div>`;
   if (!embed) return card;
+  const ariaLabel = lang === 'tr' ? `${title} raporu, sayfa içinde okunabilir` : `${title} report, readable inline`;
+  const fallback = lang === 'tr'
+    ? `Tarayıcınız PDF'i bu sayfada görüntüleyemiyor. <a href="${escapeHtml(doc.pdfUrl)}" target="_blank" rel="noopener">Raporu yeni sekmede açmak için tıklayın</a>.`
+    : `Your browser can't display this PDF inline. <a href="${escapeHtml(doc.pdfUrl)}" target="_blank" rel="noopener">Open the report in a new tab</a>.`;
   return `${card}
   <div class="pub-reader">
-    <object class="pub-reader__embed" data="${escapeHtml(doc.pdfUrl)}" type="application/pdf" aria-label="${escapeHtml(title)}">
-      <p class="pub-reader__fallback">Tarayıcınız PDF'i bu sayfada görüntüleyemiyor. <a href="${escapeHtml(doc.pdfUrl)}" target="_blank" rel="noopener">Raporu yeni sekmede açmak için tıklayın</a>.</p>
+    <object class="pub-reader__embed" data="${escapeHtml(doc.pdfUrl)}" type="application/pdf" aria-label="${escapeHtml(ariaLabel)}">
+      <p class="pub-reader__fallback">${fallback}</p>
     </object>
   </div>`;
 }
@@ -76,7 +85,7 @@ export async function initAnnouncements(containerId) {
   const lang = document.documentElement.lang === 'tr' ? 'tr' : 'en';
   try {
     const docs = await fetchDocs('announcement');
-    container.innerHTML = docs.map((doc) => renderAnnouncementHTML(doc, lang)).join('\n');
+    container.innerHTML = docs.map((doc, i) => renderAnnouncementHTML(doc, lang, i)).join('\n');
     scrollToHash(container);
   } catch (err) {
     showError(container, lang);
@@ -125,6 +134,10 @@ export async function initCarousel(containerId, onRendered) {
       const alt = resolveLocalized(doc, 'coverImageAlt', lang);
       const targetPage = buildCarouselLinkTarget(doc, lang);
       const readmore = lang === 'tr' ? 'Devamını oku' : 'Read more';
+      const isPublication = doc._kind === 'publication';
+      const readmoreSuffix = isPublication
+        ? (lang === 'tr' ? ' (Yayınlar sayfasında)' : ' (on the Publications page)')
+        : (lang === 'tr' ? ' (Duyurular sayfasında)' : ' (on the Announcements page)');
       return `<li class="pub-slide">
         <article class="pub-row">
           <div class="pub-cover"><img src="${escapeHtml(buildCoverUrl(doc.coverUrl, 600))}" alt="${escapeHtml(alt)}"></div>
@@ -132,7 +145,7 @@ export async function initCarousel(containerId, onRendered) {
             <div class="pub-meta">${escapeHtml(doc.dateLabel)}</div>
             <h3>${escapeHtml(title)}</h3>
             <p>${escapeHtml(teaser || '')}</p>
-            <a class="pub-readmore" href="${targetPage}#${escapeHtml(doc.slug.current)}">${readmore}<span aria-hidden="true"> →</span></a>
+            <a class="pub-readmore" href="${targetPage}#${escapeHtml(doc.slug.current)}">${readmore}<span aria-hidden="true"> →</span><span class="visually-hidden">${readmoreSuffix}</span></a>
           </div>
         </article>
       </li>`;
