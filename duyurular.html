@@ -175,7 +175,7 @@
 
 <script type="module">
   import { initAnnouncements } from './assets/sanity-content.js';
-  initAnnouncements('duyurular-list');
+  initAnnouncements('duyurular-list').then(() => window.initFlowMesh && window.initFlowMesh());
 </script>
 
 </body>

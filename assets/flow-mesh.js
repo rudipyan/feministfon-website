@@ -43,6 +43,7 @@
    text) with a blue bloom — instead of aliasing SCENES.blue. */
 (function () {
   var EMPTY_BLOBS = [];
+  var started = false;
   var DESATURATE = 0.15; // 0 = original brand hue, 1 = flat gray
 
   function desaturate(rgb, amount) {
@@ -92,17 +93,27 @@
     return [parseInt(hex.slice(0, 2), 16), parseInt(hex.slice(2, 4), 16), parseInt(hex.slice(4, 6), 16)];
   }
 
-  var cssVal = getComputedStyle(document.documentElement);
-  var sections = Array.prototype.map.call(document.querySelectorAll('[data-flow]'), function (el) {
-    var name = el.dataset.flow;
-    var a = cssVal.getPropertyValue('--flow-' + name + '-a').trim();
-    var b = cssVal.getPropertyValue('--flow-' + name + '-b').trim();
-    return { el: el, baseA: desaturate(hexToRgb(a), DESATURATE), baseB: desaturate(hexToRgb(b), DESATURATE), blobs: SCENES[name] || EMPTY_BLOBS };
-  });
+  // Wrapped in a named, re-callable entry point (rather than running only
+  // once as a bare IIFE body) because on duyurular.html/en-duyurular.html
+  // the [data-flow] elements are injected asynchronously by Sanity content
+  // after this script's first pass already ran and found nothing — same
+  // timing problem initPubCarouselBehavior solves for the homepage
+  // carousel. Exposed as window.initFlowMesh so a module script can call it
+  // again once the async content render finishes.
+  function initFlowMesh() {
+    if (started) return; // already scanning + listening; nothing to redo
+    var cssVal = getComputedStyle(document.documentElement);
+    var sections = Array.prototype.map.call(document.querySelectorAll('[data-flow]'), function (el) {
+      var name = el.dataset.flow;
+      var a = cssVal.getPropertyValue('--flow-' + name + '-a').trim();
+      var b = cssVal.getPropertyValue('--flow-' + name + '-b').trim();
+      return { el: el, baseA: desaturate(hexToRgb(a), DESATURATE), baseB: desaturate(hexToRgb(b), DESATURATE), blobs: SCENES[name] || EMPTY_BLOBS };
+    });
 
-  var flowBg = document.getElementById('flow-bg');
-  if (!flowBg || !sections.length) return;
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var flowBg = document.getElementById('flow-bg');
+    if (!flowBg || !sections.length) return;
+    started = true;
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function lerp(a, b, t) { return a + (b - a) * t; }
   function lerpColor(a, b, t) {
@@ -180,4 +191,8 @@
   document.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', updateFlow);
   updateFlow();
+  }
+
+  initFlowMesh();
+  window.initFlowMesh = initFlowMesh;
 })();
