@@ -6,7 +6,7 @@ import { schemaTypes } from './schemaTypes';
 export default defineConfig({
   name: 'default',
   title: 'Feminist Fon İnisiyatifi',
-  projectId: 'REPLACE_WITH_PROJECT_ID',
+  projectId: '6x1ga0me',
   dataset: 'production',
   plugins: [structureTool(), visionTool()],
   schema: {
