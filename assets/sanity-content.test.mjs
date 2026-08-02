@@ -1,7 +1,7 @@
 // assets/sanity-content.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { renderAnnouncementHTML, buildCarouselLinkTarget } from './sanity-content.js';
+import { renderAnnouncementHTML, renderPublicationHTML, buildCarouselLinkTarget } from './sanity-content.js';
 
 test('renderAnnouncementHTML produces the expected structure with a link', () => {
   const doc = {
@@ -23,6 +23,20 @@ test('renderAnnouncementHTML produces the expected structure with a link', () =>
   assert.match(html, /alt="Alt EN"/);
   assert.match(html, /href="https:\/\/example\.org\/report\.pdf"/);
   assert.match(html, /Read report/);
+  assert.match(html, /data-flow="duyuru1"/);
+  assert.match(html, / \(opens in new tab\)/);
+});
+
+test('renderAnnouncementHTML numbers data-flow by 1-indexed render position', () => {
+  const doc = {
+    slug: { current: 'csw68' }, titleTr: 'Başlık', dateLabel: '2024',
+    coverUrl: 'https://cdn.sanity.io/x.png', coverImageAltTr: 'Alt',
+    bodyTr: ['Paragraf.'],
+    linkUrl: 'https://example.org/report.pdf', linkLabelTr: 'Raporu oku',
+  };
+  const html = renderAnnouncementHTML(doc, 'tr', 2);
+  assert.match(html, /data-flow="duyuru3"/);
+  assert.match(html, / \(yeni sekmede açılır\)/);
 });
 
 test('renderAnnouncementHTML omits the link block when linkUrl is absent', () => {
@@ -67,6 +81,46 @@ test('renderAnnouncementHTML escapes double quotes so they cannot break out of a
   assert.doesNotMatch(html, /onclick="alert\(1\)"/);
   assert.match(html, /alt="Zararlı&quot; onerror=&quot;alert\(1\)"/);
   assert.match(html, /href="https:\/\/example\.org\/x&quot;onclick=&quot;alert\(1\)"/);
+});
+
+test('renderPublicationHTML (en, embedded) renders id, body paragraphs, and EN strings', () => {
+  const doc = {
+    slug: { current: 'ffi-fizibilite-raporu' },
+    titleTr: 'Türkçe Başlık', titleEn: 'A Feminist Fund',
+    dateLabel: 'June 2026',
+    coverUrl: 'https://cdn.sanity.io/x.png',
+    coverImageAltTr: 'TR Alt', coverImageAltEn: 'EN Alt',
+    bodyTr: ['Paragraf bir.', 'Paragraf iki.'],
+    bodyEn: ['Paragraph one.', 'Paragraph two.'],
+    pdfUrl: 'https://example.org/report.pdf',
+  };
+  const html = renderPublicationHTML(doc, 'en', { embed: true });
+  assert.match(html, /id="ffi-fizibilite-raporu"/);
+  assert.match(html, /Paragraph one\./);
+  assert.match(html, /Paragraph two\./);
+  assert.match(html, />Read the Report</);
+  assert.match(html, / \(opens in new tab\)/);
+  assert.match(html, /report, readable inline/);
+  assert.match(html, /Your browser can't display this PDF inline/);
+});
+
+test('renderPublicationHTML (tr, embedded) renders TR strings and falls back to bodyTr', () => {
+  const doc = {
+    slug: { current: 'ffi-fizibilite-raporu' },
+    titleTr: 'Türkçe Başlık',
+    dateLabel: 'Haziran 2026',
+    coverUrl: 'https://cdn.sanity.io/x.png',
+    coverImageAltTr: 'TR Alt',
+    bodyTr: ['Paragraf bir.', 'Paragraf iki.'],
+    pdfUrl: 'https://example.org/report.pdf',
+  };
+  const html = renderPublicationHTML(doc, 'tr', { embed: true });
+  assert.match(html, /Paragraf bir\./);
+  assert.match(html, /Paragraf iki\./);
+  assert.match(html, />Raporu Okuyun</);
+  assert.match(html, / \(yeni sekmede açılır\)/);
+  assert.match(html, /raporu, sayfa içinde okunabilir/);
+  assert.match(html, /Tarayıcınız PDF'i bu sayfada görüntüleyemiyor/);
 });
 
 test('buildCarouselLinkTarget routes announcements to duyurular pages by kind, not field presence', () => {
