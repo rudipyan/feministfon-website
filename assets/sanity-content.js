@@ -65,6 +65,7 @@ async function fetchDocs(type, { limit } = {}) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Sanity fetch failed: ${res.status}`);
   const { result } = await res.json();
+  if (!Array.isArray(result)) throw new Error('Sanity response missing result array');
   return result;
 }
 
