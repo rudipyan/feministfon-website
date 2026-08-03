@@ -25,6 +25,13 @@ export default {
       validation: (Rule) => Rule.required(),
     },
     { name: 'order', title: 'Manual sort override (optional)', type: 'number' },
+    {
+      name: 'hideFromCarousel',
+      title: 'Hide from homepage carousel',
+      description: 'Check this if the announcement covers the same topic as a publication already shown in the carousel (e.g. an announcement about a report that also has its own publication entry), to avoid showing the same story twice.',
+      type: 'boolean',
+      initialValue: false,
+    },
     { name: 'coverImage', title: 'Cover image', type: 'image', validation: (Rule) => Rule.required() },
     { name: 'coverImageAltTr', title: 'Cover image alt text (TR)', type: 'string', validation: (Rule) => Rule.required() },
     { name: 'coverImageAltEn', title: 'Cover image alt text (EN)', type: 'string', validation: (Rule) => Rule.required() },

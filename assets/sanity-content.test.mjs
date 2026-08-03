@@ -1,7 +1,7 @@
 // assets/sanity-content.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { renderAnnouncementHTML, renderPublicationHTML, buildCarouselLinkTarget } from './sanity-content.js';
+import { renderAnnouncementHTML, renderPublicationHTML, buildCarouselLinkTarget, combineCarouselDocs } from './sanity-content.js';
 
 test('renderAnnouncementHTML produces the expected structure with a link', () => {
   const doc = {
@@ -133,4 +133,33 @@ test('buildCarouselLinkTarget routes publications to yayinlar pages', () => {
   const publication = { _kind: 'publication', pdfUrl: 'https://example.org/report.pdf' };
   assert.equal(buildCarouselLinkTarget(publication, 'tr'), 'yayinlar.html');
   assert.equal(buildCarouselLinkTarget(publication, 'en'), 'en-yayinlar.html');
+});
+
+test('combineCarouselDocs excludes announcements flagged hideFromCarousel', () => {
+  const announcements = [
+    { _id: 'a1', hideFromCarousel: true, publishedAt: '2026-06-01T00:00:00.000Z' },
+    { _id: 'a2', hideFromCarousel: false, publishedAt: '2026-04-27T00:00:00.000Z' },
+  ];
+  const publications = [
+    { _id: 'p1', publishedAt: '2026-06-01T00:00:00.000Z' },
+  ];
+  const combined = combineCarouselDocs(announcements, publications);
+  assert.equal(combined.length, 2);
+  assert.ok(!combined.some((d) => d._id === 'a1'));
+  assert.ok(combined.some((d) => d._id === 'a2' && d._kind === 'announcement'));
+  assert.ok(combined.some((d) => d._id === 'p1' && d._kind === 'publication'));
+});
+
+test('combineCarouselDocs sorts by order then publishedAt and caps at 6', () => {
+  const announcements = Array.from({ length: 5 }, (_, i) => ({
+    _id: `a${i}`,
+    publishedAt: new Date(2026, 0, i + 1).toISOString(),
+  }));
+  const publications = Array.from({ length: 3 }, (_, i) => ({
+    _id: `p${i}`,
+    publishedAt: new Date(2025, 0, i + 1).toISOString(),
+  }));
+  const combined = combineCarouselDocs(announcements, publications);
+  assert.equal(combined.length, 6);
+  assert.equal(combined[0]._id, 'a4');
 });

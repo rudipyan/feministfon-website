@@ -22,6 +22,6 @@ export function buildQuery(type, { limit } = {}) {
   return `*[_type == "${type}" && !(_id in path("drafts.**"))] | order(coalesce(order, -1) desc, publishedAt desc)${range}{
     _id, slug, titleTr, titleEn, dateLabel, publishedAt, order,
     "coverUrl": coverImage.asset->url, coverImageAltTr, coverImageAltEn,
-    bodyTr, bodyEn, teaserTr, teaserEn, linkUrl, linkLabelTr, linkLabelEn, pdfUrl
+    bodyTr, bodyEn, teaserTr, teaserEn, linkUrl, linkLabelTr, linkLabelEn, pdfUrl, hideFromCarousel
   }`;
 }
