@@ -140,26 +140,18 @@ test('combineCarouselDocs excludes announcements flagged hideFromCarousel', () =
     { _id: 'a1', hideFromCarousel: true, publishedAt: '2026-06-01T00:00:00.000Z' },
     { _id: 'a2', hideFromCarousel: false, publishedAt: '2026-04-27T00:00:00.000Z' },
   ];
-  const publications = [
-    { _id: 'p1', publishedAt: '2026-06-01T00:00:00.000Z' },
-  ];
-  const combined = combineCarouselDocs(announcements, publications);
-  assert.equal(combined.length, 2);
+  const combined = combineCarouselDocs(announcements);
+  assert.equal(combined.length, 1);
   assert.ok(!combined.some((d) => d._id === 'a1'));
   assert.ok(combined.some((d) => d._id === 'a2' && d._kind === 'announcement'));
-  assert.ok(combined.some((d) => d._id === 'p1' && d._kind === 'publication'));
 });
 
 test('combineCarouselDocs sorts by order then publishedAt and caps at 6', () => {
-  const announcements = Array.from({ length: 5 }, (_, i) => ({
+  const announcements = Array.from({ length: 8 }, (_, i) => ({
     _id: `a${i}`,
     publishedAt: new Date(2026, 0, i + 1).toISOString(),
   }));
-  const publications = Array.from({ length: 3 }, (_, i) => ({
-    _id: `p${i}`,
-    publishedAt: new Date(2025, 0, i + 1).toISOString(),
-  }));
-  const combined = combineCarouselDocs(announcements, publications);
+  const combined = combineCarouselDocs(announcements);
   assert.equal(combined.length, 6);
-  assert.equal(combined[0]._id, 'a4');
+  assert.equal(combined[0]._id, 'a7');
 });

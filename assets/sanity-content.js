@@ -112,11 +112,10 @@ export function buildCarouselLinkTarget(doc, lang) {
     : (lang === 'tr' ? 'duyurular.html' : 'en-duyurular.html');
 }
 
-export function combineCarouselDocs(announcements, publications) {
-  return [
-    ...announcements.filter((d) => !d.hideFromCarousel).map((d) => ({ ...d, _kind: 'announcement' })),
-    ...publications.map((d) => ({ ...d, _kind: 'publication' })),
-  ]
+export function combineCarouselDocs(announcements) {
+  return announcements
+    .filter((d) => !d.hideFromCarousel)
+    .map((d) => ({ ...d, _kind: 'announcement' }))
     .sort((a, b) => (b.order ?? -1) - (a.order ?? -1) || new Date(b.publishedAt) - new Date(a.publishedAt))
     .slice(0, 6);
 }
@@ -126,11 +125,8 @@ export async function initCarousel(containerId, onRendered) {
   if (!container) return;
   const lang = document.documentElement.lang === 'tr' ? 'tr' : 'en';
   try {
-    const [announcements, publications] = await Promise.all([
-      fetchDocs('announcement', { limit: 6 }),
-      fetchDocs('publication', { limit: 6 }),
-    ]);
-    const combined = combineCarouselDocs(announcements, publications);
+    const announcements = await fetchDocs('announcement', { limit: 6 });
+    const combined = combineCarouselDocs(announcements);
     container.innerHTML = combined.map((doc) => {
       const teaser = resolveLocalized(doc, 'teaser', lang)
         || truncateTeaser((lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr))?.[0] || '', 140);
@@ -138,10 +134,7 @@ export async function initCarousel(containerId, onRendered) {
       const alt = resolveLocalized(doc, 'coverImageAlt', lang);
       const targetPage = buildCarouselLinkTarget(doc, lang);
       const readmore = lang === 'tr' ? 'Devamını oku' : 'Read more';
-      const isPublication = doc._kind === 'publication';
-      const readmoreSuffix = isPublication
-        ? (lang === 'tr' ? ' (Yayınlar sayfasında)' : ' (on the Publications page)')
-        : (lang === 'tr' ? ' (Duyurular sayfasında)' : ' (on the Announcements page)');
+      const readmoreSuffix = lang === 'tr' ? ' (Duyurular sayfasında)' : ' (on the Announcements page)';
       return `<li class="pub-slide">
         <article class="pub-row">
           <div class="pub-cover"><img src="${escapeHtml(buildCoverUrl(doc.coverUrl, 600))}" alt="${escapeHtml(alt)}"></div>

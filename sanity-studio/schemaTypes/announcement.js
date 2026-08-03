@@ -28,7 +28,7 @@ export default {
     {
       name: 'hideFromCarousel',
       title: 'Hide from homepage carousel',
-      description: 'Check if this duplicates a publication already in the carousel.',
+      description: 'Check to hide from the homepage carousel.',
       type: 'boolean',
       initialValue: false,
     },
