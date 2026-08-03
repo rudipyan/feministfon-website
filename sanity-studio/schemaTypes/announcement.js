@@ -28,7 +28,7 @@ export default {
     {
       name: 'hideFromCarousel',
       title: 'Hide from homepage carousel',
-      description: 'Check this if the announcement covers the same topic as a publication already shown in the carousel (e.g. an announcement about a report that also has its own publication entry), to avoid showing the same story twice.',
+      description: 'Check if this duplicates a publication already in the carousel.',
       type: 'boolean',
       initialValue: false,
     },
