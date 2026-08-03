@@ -3,3 +3,5 @@ sanity-studio/dist/
 sanity-studio/.sanity/
 .env
 .env.*
+.vercel
+.env*
