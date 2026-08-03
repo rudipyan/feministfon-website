@@ -1,3 +1,5 @@
+import richTextBlock from './richTextBlock.js';
+
 export default {
   name: 'publication',
   title: 'Yayın / Publication',
@@ -34,10 +36,10 @@ export default {
       name: 'bodyTr',
       title: 'Body paragraphs (TR)',
       type: 'array',
-      of: [{ type: 'text' }],
+      of: [richTextBlock],
       validation: (Rule) => Rule.required().min(1),
     },
-    { name: 'bodyEn', title: 'Body paragraphs (EN)', type: 'array', of: [{ type: 'text' }] },
+    { name: 'bodyEn', title: 'Body paragraphs (EN)', type: 'array', of: [richTextBlock] },
     { name: 'teaserTr', title: 'Homepage teaser (TR, optional)', type: 'text' },
     { name: 'teaserEn', title: 'Homepage teaser (EN, optional)', type: 'text' },
   ],

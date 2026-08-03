@@ -1,15 +1,11 @@
-import { resolveLocalized, resolveDateLabel, truncateTeaser, buildCoverUrl, buildQuery } from './sanity-content-helpers.mjs';
+import { resolveLocalized, resolveDateLabel, truncateTeaser, buildCoverUrl, buildQuery, escapeHtml, renderPortableText, blockToPlainText } from './sanity-content-helpers.mjs';
 import { SANITY_PROJECT_ID, SANITY_DATASET, SANITY_API_VERSION } from './sanity-config.js';
-
-function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
 
 export function renderAnnouncementHTML(doc, lang, index = 0) {
   const title = resolveLocalized(doc, 'title', lang);
   const alt = resolveLocalized(doc, 'coverImageAlt', lang);
   const paragraphs = lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr);
-  const bodyHtml = (paragraphs || []).map((p) => `<p>${escapeHtml(p)}</p>`).join('\n');
+  const bodyHtml = renderPortableText(paragraphs);
   const linkLabel = resolveLocalized(doc, 'linkLabel', lang);
   const newTabSuffix = lang === 'tr' ? ' (yeni sekmede açılır)' : ' (opens in new tab)';
   const linkHtml = doc.linkUrl
@@ -34,7 +30,7 @@ export function renderPublicationHTML(doc, lang, { embed } = { embed: false }) {
   const readLabel = lang === 'tr' ? 'Raporu Okuyun' : 'Read the Report';
   const newTabSuffix = lang === 'tr' ? ' (yeni sekmede açılır)' : ' (opens in new tab)';
   const paragraphs = lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr);
-  const bodyHtml = (paragraphs || []).map((p) => `<p>${escapeHtml(p)}</p>`).join('\n');
+  const bodyHtml = renderPortableText(paragraphs);
   const card = `<div class="pub-row" id="${escapeHtml(doc.slug.current)}">
     <div class="pub-cover"><img src="${escapeHtml(buildCoverUrl(doc.coverUrl, 600))}" alt="${escapeHtml(alt)}"></div>
     <div class="pub-copy">
@@ -141,8 +137,9 @@ export async function initCarousel(containerId, onRendered) {
   }
   const combined = combineCarouselDocs(announcements);
   container.innerHTML = combined.map((doc) => {
+    const firstParagraph = (lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr))?.[0];
     const teaser = resolveLocalized(doc, 'teaser', lang)
-      || truncateTeaser((lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr))?.[0] || '', 140);
+      || truncateTeaser(blockToPlainText(firstParagraph), 140);
     const title = resolveLocalized(doc, 'title', lang);
     const alt = resolveLocalized(doc, 'coverImageAlt', lang);
     const targetPage = buildCarouselLinkTarget(doc, lang);

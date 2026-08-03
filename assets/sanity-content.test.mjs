@@ -3,6 +3,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { renderAnnouncementHTML, renderPublicationHTML, buildCarouselLinkTarget, combineCarouselDocs } from './sanity-content.js';
 
+function block(text, marks = []) {
+  return { _type: 'block', style: 'normal', children: [{ _type: 'span', text, marks }], markDefs: [] };
+}
+
 test('renderAnnouncementHTML produces the expected structure with a link', () => {
   const doc = {
     slug: { current: 'women-deliver-2026' },
@@ -10,8 +14,8 @@ test('renderAnnouncementHTML produces the expected structure with a link', () =>
     dateLabel: '27–30 Nisan 2026',
     coverUrl: 'https://cdn.sanity.io/images/x/production/img-800x600.png',
     coverImageAltTr: 'Alt TR', coverImageAltEn: 'Alt EN',
-    bodyTr: ['Paragraf bir.', 'Paragraf iki.'],
-    bodyEn: ['Paragraph one.', 'Paragraph two.'],
+    bodyTr: [block('Paragraf bir.'), block('Paragraf iki.')],
+    bodyEn: [block('Paragraph one.'), block('Paragraph two.')],
     linkUrl: 'https://example.org/report.pdf',
     linkLabelTr: 'Raporu oku', linkLabelEn: 'Read report',
   };
@@ -31,7 +35,7 @@ test('renderAnnouncementHTML numbers data-flow by 1-indexed render position', ()
   const doc = {
     slug: { current: 'csw68' }, titleTr: 'Başlık', dateLabel: '2024',
     coverUrl: 'https://cdn.sanity.io/x.png', coverImageAltTr: 'Alt',
-    bodyTr: ['Paragraf.'],
+    bodyTr: [block('Paragraf.')],
     linkUrl: 'https://example.org/report.pdf', linkLabelTr: 'Raporu oku',
   };
   const html = renderAnnouncementHTML(doc, 'tr', 2);
@@ -43,7 +47,7 @@ test('renderAnnouncementHTML wraps data-flow back to duyuru1 past the 6-scene pa
   const doc = {
     slug: { current: 'seventh' }, titleTr: 'Yedinci', dateLabel: '2027',
     coverUrl: 'https://cdn.sanity.io/x.png', coverImageAltTr: 'Alt',
-    bodyTr: ['Paragraf.'],
+    bodyTr: [block('Paragraf.')],
   };
   assert.match(renderAnnouncementHTML(doc, 'tr', 6), /data-flow="duyuru1"/);
   assert.match(renderAnnouncementHTML(doc, 'tr', 7), /data-flow="duyuru2"/);
@@ -53,7 +57,7 @@ test('renderAnnouncementHTML omits the link block when linkUrl is absent', () =>
   const doc = {
     slug: { current: 'edge-2025' }, titleTr: 'Başlık', dateLabel: '2025',
     coverUrl: 'https://cdn.sanity.io/x.png', coverImageAltTr: 'Alt',
-    bodyTr: ['Tek paragraf.'],
+    bodyTr: [block('Tek paragraf.')],
   };
   const html = renderAnnouncementHTML(doc, 'tr');
   assert.doesNotMatch(html, /report-link/);
@@ -66,7 +70,7 @@ test('renderAnnouncementHTML handles missing teaser and empty bodyEn gracefully'
     dateLabel: '2026',
     coverUrl: 'https://cdn.sanity.io/x.png',
     coverImageAltTr: 'TR Alt', coverImageAltEn: 'EN Alt',
-    bodyTr: ['Turkish body paragraph.'],
+    bodyTr: [block('Turkish body paragraph.')],
     bodyEn: [], // empty array — should fallback to bodyTr
   };
   const html = renderAnnouncementHTML(doc, 'en');
@@ -82,7 +86,7 @@ test('renderAnnouncementHTML escapes double quotes so they cannot break out of a
     dateLabel: '2026',
     coverUrl: 'https://cdn.sanity.io/x.png',
     coverImageAltTr: 'Zararlı" onerror="alert(1)', coverImageAltEn: 'Zararlı" onerror="alert(1)',
-    bodyTr: ['Paragraf.'],
+    bodyTr: [block('Paragraf.')],
     linkUrl: 'https://example.org/x"onclick="alert(1)',
     linkLabelTr: 'Link',
   };
@@ -100,8 +104,8 @@ test('renderPublicationHTML (en, embedded) renders id, body paragraphs, and EN s
     dateLabel: 'June 2026',
     coverUrl: 'https://cdn.sanity.io/x.png',
     coverImageAltTr: 'TR Alt', coverImageAltEn: 'EN Alt',
-    bodyTr: ['Paragraf bir.', 'Paragraf iki.'],
-    bodyEn: ['Paragraph one.', 'Paragraph two.'],
+    bodyTr: [block('Paragraf bir.'), block('Paragraf iki.')],
+    bodyEn: [block('Paragraph one.'), block('Paragraph two.')],
     pdfUrl: 'https://example.org/report.pdf',
   };
   const html = renderPublicationHTML(doc, 'en', { embed: true });
@@ -121,7 +125,7 @@ test('renderPublicationHTML (tr, embedded) renders TR strings and falls back to 
     dateLabel: 'Haziran 2026',
     coverUrl: 'https://cdn.sanity.io/x.png',
     coverImageAltTr: 'TR Alt',
-    bodyTr: ['Paragraf bir.', 'Paragraf iki.'],
+    bodyTr: [block('Paragraf bir.'), block('Paragraf iki.')],
     pdfUrl: 'https://example.org/report.pdf',
   };
   const html = renderPublicationHTML(doc, 'tr', { embed: true });
