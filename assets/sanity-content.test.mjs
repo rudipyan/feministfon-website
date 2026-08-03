@@ -39,6 +39,16 @@ test('renderAnnouncementHTML numbers data-flow by 1-indexed render position', ()
   assert.match(html, / \(yeni sekmede açılır\)/);
 });
 
+test('renderAnnouncementHTML wraps data-flow back to duyuru1 past the 6-scene palette', () => {
+  const doc = {
+    slug: { current: 'seventh' }, titleTr: 'Yedinci', dateLabel: '2027',
+    coverUrl: 'https://cdn.sanity.io/x.png', coverImageAltTr: 'Alt',
+    bodyTr: ['Paragraf.'],
+  };
+  assert.match(renderAnnouncementHTML(doc, 'tr', 6), /data-flow="duyuru1"/);
+  assert.match(renderAnnouncementHTML(doc, 'tr', 7), /data-flow="duyuru2"/);
+});
+
 test('renderAnnouncementHTML omits the link block when linkUrl is absent', () => {
   const doc = {
     slug: { current: 'edge-2025' }, titleTr: 'Başlık', dateLabel: '2025',

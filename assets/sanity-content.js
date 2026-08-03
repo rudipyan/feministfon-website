@@ -15,7 +15,7 @@ export function renderAnnouncementHTML(doc, lang, index = 0) {
   const linkHtml = doc.linkUrl
     ? `<p><a class="report-link" href="${escapeHtml(doc.linkUrl)}" target="_blank" rel="noopener">${escapeHtml(linkLabel || doc.linkUrl)}<span class="visually-hidden">${newTabSuffix}</span></a></p>`
     : '';
-  return `<article class="duyuru" id="${escapeHtml(doc.slug.current)}" data-flow="duyuru${index + 1}">
+  return `<article class="duyuru" id="${escapeHtml(doc.slug.current)}" data-flow="duyuru${(index % 6) + 1}">
     <div class="duyuru-row">
       <div class="duyuru-cover"><img src="${escapeHtml(buildCoverUrl(doc.coverUrl, 600))}" alt="${escapeHtml(alt)}"></div>
       <div class="duyuru-copy">
@@ -83,26 +83,32 @@ export async function initAnnouncements(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
   const lang = document.documentElement.lang === 'tr' ? 'tr' : 'en';
+  let docs;
   try {
-    const docs = await fetchDocs('announcement');
-    container.innerHTML = docs.map((doc, i) => renderAnnouncementHTML(doc, lang, i)).join('\n');
-    scrollToHash(container);
+    docs = await fetchDocs('announcement');
   } catch (err) {
+    console.error('Sanity fetch failed for announcements:', err);
     showError(container, lang);
+    return;
   }
+  container.innerHTML = docs.map((doc, i) => renderAnnouncementHTML(doc, lang, i)).join('\n');
+  scrollToHash(container);
 }
 
 export async function initPublications(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
   const lang = document.documentElement.lang === 'tr' ? 'tr' : 'en';
+  let docs;
   try {
-    const docs = await fetchDocs('publication');
-    container.innerHTML = docs.map((doc, i) => renderPublicationHTML(doc, lang, { embed: i === 0 })).join('\n');
-    scrollToHash(container);
+    docs = await fetchDocs('publication');
   } catch (err) {
+    console.error('Sanity fetch failed for publications:', err);
     showError(container, lang);
+    return;
   }
+  container.innerHTML = docs.map((doc, i) => renderPublicationHTML(doc, lang, { embed: i === 0 })).join('\n');
+  scrollToHash(container);
 }
 
 export function buildCarouselLinkTarget(doc, lang) {
@@ -124,31 +130,34 @@ export async function initCarousel(containerId, onRendered) {
   const container = document.getElementById(containerId);
   if (!container) return;
   const lang = document.documentElement.lang === 'tr' ? 'tr' : 'en';
+  let announcements;
   try {
-    const announcements = await fetchDocs('announcement', { limit: 6 });
-    const combined = combineCarouselDocs(announcements);
-    container.innerHTML = combined.map((doc) => {
-      const teaser = resolveLocalized(doc, 'teaser', lang)
-        || truncateTeaser((lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr))?.[0] || '', 140);
-      const title = resolveLocalized(doc, 'title', lang);
-      const alt = resolveLocalized(doc, 'coverImageAlt', lang);
-      const targetPage = buildCarouselLinkTarget(doc, lang);
-      const readmore = lang === 'tr' ? 'Devamını oku' : 'Read more';
-      const readmoreSuffix = lang === 'tr' ? ' (Duyurular sayfasında)' : ' (on the Announcements page)';
-      return `<li class="pub-slide">
-        <article class="pub-row">
-          <div class="pub-cover"><img src="${escapeHtml(buildCoverUrl(doc.coverUrl, 600))}" alt="${escapeHtml(alt)}"></div>
-          <div class="pub-copy">
-            <div class="pub-meta">${escapeHtml(doc.dateLabel)}</div>
-            <h3>${escapeHtml(title)}</h3>
-            <p>${escapeHtml(teaser || '')}</p>
-            <a class="pub-readmore" href="${targetPage}#${escapeHtml(doc.slug.current)}">${readmore}<span aria-hidden="true"> →</span><span class="visually-hidden">${readmoreSuffix}</span></a>
-          </div>
-        </article>
-      </li>`;
-    }).join('\n');
-    if (onRendered) onRendered();
+    announcements = await fetchDocs('announcement', { limit: 12 });
   } catch (err) {
+    console.error('Sanity fetch failed for carousel:', err);
     showError(container, lang);
+    return;
   }
+  const combined = combineCarouselDocs(announcements);
+  container.innerHTML = combined.map((doc) => {
+    const teaser = resolveLocalized(doc, 'teaser', lang)
+      || truncateTeaser((lang === 'tr' ? doc.bodyTr : (doc.bodyEn && doc.bodyEn.length ? doc.bodyEn : doc.bodyTr))?.[0] || '', 140);
+    const title = resolveLocalized(doc, 'title', lang);
+    const alt = resolveLocalized(doc, 'coverImageAlt', lang);
+    const targetPage = buildCarouselLinkTarget(doc, lang);
+    const readmore = lang === 'tr' ? 'Devamını oku' : 'Read more';
+    const readmoreSuffix = lang === 'tr' ? ' (Duyurular sayfasında)' : ' (on the Announcements page)';
+    return `<li class="pub-slide">
+      <article class="pub-row">
+        <div class="pub-cover"><img src="${escapeHtml(buildCoverUrl(doc.coverUrl, 600))}" alt="${escapeHtml(alt)}"></div>
+        <div class="pub-copy">
+          <div class="pub-meta">${escapeHtml(doc.dateLabel)}</div>
+          <h3>${escapeHtml(title)}</h3>
+          <p>${escapeHtml(teaser || '')}</p>
+          <a class="pub-readmore" href="${targetPage}#${escapeHtml(doc.slug.current)}">${readmore}<span aria-hidden="true"> →</span><span class="visually-hidden">${readmoreSuffix}</span></a>
+        </div>
+      </article>
+    </li>`;
+  }).join('\n');
+  if (onRendered) onRendered();
 }
