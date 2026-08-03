@@ -16,7 +16,8 @@ export default {
       },
       validation: (Rule) => Rule.required(),
     },
-    { name: 'dateLabel', title: 'Date label (free text)', type: 'string', validation: (Rule) => Rule.required() },
+    { name: 'dateLabel', title: 'Date label (TR, free text)', type: 'string', validation: (Rule) => Rule.required() },
+    { name: 'dateLabelEn', title: 'Date label (EN, free text)', type: 'string' },
     {
       name: 'publishedAt',
       title: 'Published date',

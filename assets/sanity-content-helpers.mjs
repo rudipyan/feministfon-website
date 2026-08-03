@@ -5,6 +5,11 @@ export function resolveLocalized(doc, fieldBase, lang) {
   return enValue && enValue.trim() !== '' ? enValue : (doc[`${fieldBase}Tr`] ?? '');
 }
 
+export function resolveDateLabel(doc, lang) {
+  if (lang === 'tr') return doc.dateLabel ?? '';
+  return doc.dateLabelEn && doc.dateLabelEn.trim() !== '' ? doc.dateLabelEn : (doc.dateLabel ?? '');
+}
+
 export function truncateTeaser(text, maxLen) {
   if (!text || text.length <= maxLen) return text;
   const cut = text.slice(0, maxLen);
@@ -20,7 +25,7 @@ export function buildCoverUrl(rawUrl, width) {
 export function buildQuery(type, { limit } = {}) {
   const range = limit ? `[0..${limit - 1}]` : '';
   return `*[_type == "${type}" && !(_id in path("drafts.**"))] | order(coalesce(order, -1) desc, publishedAt desc)${range}{
-    _id, slug, titleTr, titleEn, dateLabel, publishedAt, order,
+    _id, slug, titleTr, titleEn, dateLabel, dateLabelEn, publishedAt, order,
     "coverUrl": coverImage.asset->url, coverImageAltTr, coverImageAltEn,
     bodyTr, bodyEn, teaserTr, teaserEn, linkUrl, linkLabelTr, linkLabelEn, pdfUrl, hideFromCarousel
   }`;

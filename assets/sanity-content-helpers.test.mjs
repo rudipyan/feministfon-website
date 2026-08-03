@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveLocalized, truncateTeaser, buildCoverUrl, buildQuery } from './sanity-content-helpers.mjs';
+import { resolveLocalized, resolveDateLabel, truncateTeaser, buildCoverUrl, buildQuery } from './sanity-content-helpers.mjs';
 
 test('resolveLocalized returns the EN field when present', () => {
   const doc = { titleTr: 'Başlık', titleEn: 'Title' };
@@ -20,6 +20,21 @@ test('resolveLocalized falls back to TR when EN is missing entirely', () => {
 test('resolveLocalized returns TR field directly when lang is tr', () => {
   const doc = { titleTr: 'Başlık', titleEn: 'Title' };
   assert.equal(resolveLocalized(doc, 'title', 'tr'), 'Başlık');
+});
+
+test('resolveDateLabel returns dateLabelEn when present', () => {
+  const doc = { dateLabel: 'Haziran 2026', dateLabelEn: 'June 2026' };
+  assert.equal(resolveDateLabel(doc, 'en'), 'June 2026');
+});
+
+test('resolveDateLabel falls back to dateLabel when dateLabelEn is empty or missing', () => {
+  assert.equal(resolveDateLabel({ dateLabel: 'Haziran 2026', dateLabelEn: '' }, 'en'), 'Haziran 2026');
+  assert.equal(resolveDateLabel({ dateLabel: 'Haziran 2026' }, 'en'), 'Haziran 2026');
+});
+
+test('resolveDateLabel returns dateLabel directly when lang is tr', () => {
+  const doc = { dateLabel: 'Haziran 2026', dateLabelEn: 'June 2026' };
+  assert.equal(resolveDateLabel(doc, 'tr'), 'Haziran 2026');
 });
 
 test('truncateTeaser returns short text unchanged', () => {

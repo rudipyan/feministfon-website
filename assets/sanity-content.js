@@ -1,4 +1,4 @@
-import { resolveLocalized, truncateTeaser, buildCoverUrl, buildQuery } from './sanity-content-helpers.mjs';
+import { resolveLocalized, resolveDateLabel, truncateTeaser, buildCoverUrl, buildQuery } from './sanity-content-helpers.mjs';
 import { SANITY_PROJECT_ID, SANITY_DATASET, SANITY_API_VERSION } from './sanity-config.js';
 
 function escapeHtml(str) {
@@ -19,7 +19,7 @@ export function renderAnnouncementHTML(doc, lang, index = 0) {
     <div class="duyuru-row">
       <div class="duyuru-cover"><img src="${escapeHtml(buildCoverUrl(doc.coverUrl, 600))}" alt="${escapeHtml(alt)}"></div>
       <div class="duyuru-copy">
-        <div class="duyuru-meta">${escapeHtml(doc.dateLabel)}</div>
+        <div class="duyuru-meta">${escapeHtml(resolveDateLabel(doc, lang))}</div>
         <h2>${escapeHtml(title)}</h2>
         ${bodyHtml}
         ${linkHtml}
@@ -40,7 +40,7 @@ export function renderPublicationHTML(doc, lang, { embed } = { embed: false }) {
     <div class="pub-copy">
       <h2>${escapeHtml(title)}</h2>
       <div class="pub-meta">
-        <span class="pub-date">${escapeHtml(doc.dateLabel)}</span>
+        <span class="pub-date">${escapeHtml(resolveDateLabel(doc, lang))}</span>
         <a class="btn btn-primary" href="${escapeHtml(doc.pdfUrl)}" target="_blank" rel="noopener">${readLabel}<span class="visually-hidden">${newTabSuffix}</span></a>
       </div>
       ${bodyHtml}
@@ -152,7 +152,7 @@ export async function initCarousel(containerId, onRendered) {
       <article class="pub-row">
         <div class="pub-cover"><img src="${escapeHtml(buildCoverUrl(doc.coverUrl, 600))}" alt="${escapeHtml(alt)}"></div>
         <div class="pub-copy">
-          <div class="pub-meta">${escapeHtml(doc.dateLabel)}</div>
+          <div class="pub-meta">${escapeHtml(resolveDateLabel(doc, lang))}</div>
           <h3>${escapeHtml(title)}</h3>
           <p>${escapeHtml(teaser || '')}</p>
           <a class="pub-readmore" href="${targetPage}#${escapeHtml(doc.slug.current)}">${readmore}<span aria-hidden="true"> →</span><span class="visually-hidden">${readmoreSuffix}</span></a>
